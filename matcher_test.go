@@ -6,7 +6,7 @@ import (
 )
 
 func TestWith(t *testing.T) {
-	assert := With(t)
+	assert := With(new(testing.T))
 
 	if assert == nil {
 		t.Error("With returned nil.")
@@ -14,7 +14,7 @@ func TestWith(t *testing.T) {
 }
 
 func TestMatcher_That(t *testing.T) {
-	assert := With(t).That(nil)
+	assert := With(new(testing.T)).That(nil)
 
 	if assert == nil {
 		t.Error("That returned nil.")
@@ -34,7 +34,7 @@ func TestMatcher_That_Panics(t *testing.T) {
 }
 
 func TestMatcher_IsNil_WithNil(t *testing.T) {
-	assert := With(t).That(nil).IsNil()
+	assert := With(new(testing.T)).That(nil).IsNil()
 
 	if assert == nil {
 		t.Error("IsNil returned nil")
@@ -112,7 +112,7 @@ func TestMatcher_IsNotNil_WithNil(t *testing.T) {
 }
 
 func TestMatcher_IsNotNil_WithInt(t *testing.T) {
-	assert := With(t).That(0).IsNotNil()
+	assert := With(new(testing.T)).That(0).IsNotNil()
 
 	if assert == nil {
 		t.Error("IsNotNil returned nil")
@@ -125,7 +125,7 @@ func TestMatcher_IsNotNil_WithInt(t *testing.T) {
 }
 
 func TestMatcher_IsNotNil_WithString(t *testing.T) {
-	assert := With(t).That("String").IsNotNil()
+	assert := With(new(testing.T)).That("String").IsNotNil()
 
 	if assert == nil {
 		t.Error("IsNotNil returned nil")
@@ -138,7 +138,7 @@ func TestMatcher_IsNotNil_WithString(t *testing.T) {
 }
 
 func TestMatcher_IsNotNil_WithSlice(t *testing.T) {
-	assert := With(t).That(make([]byte, 0)).IsNotNil()
+	assert := With(new(testing.T)).That(make([]byte, 0)).IsNotNil()
 
 	if assert == nil {
 		t.Error("IsNotNil returned nil")
@@ -151,7 +151,7 @@ func TestMatcher_IsNotNil_WithSlice(t *testing.T) {
 }
 
 func TestMatcher_IsNotNil_WithObject(t *testing.T) {
-	assert := With(t).That(new(Matcher)).IsNotNil()
+	assert := With(new(testing.T)).That(new(Matcher)).IsNotNil()
 
 	if assert == nil {
 		t.Error("IsNotNil returned nil")
@@ -164,7 +164,7 @@ func TestMatcher_IsNotNil_WithObject(t *testing.T) {
 }
 
 func TestMatcher_IsEmpty_WithEmptyString(t *testing.T) {
-	assert := With(t).That("").IsEmpty()
+	assert := With(new(testing.T)).That("").IsEmpty()
 
 	if assert == nil {
 		t.Error("IsEmpty returned nil")
@@ -190,7 +190,7 @@ func TestMatcher_IsEmpty_WithString(t *testing.T) {
 }
 
 func TestMatcher_IsNotEmpty_WithString(t *testing.T) {
-	assert := With(t).That("abc").IsNotEmpty()
+	assert := With(new(testing.T)).That("abc").IsNotEmpty()
 
 	if assert == nil {
 		t.Error("IsNotEmpty returned nil")
@@ -242,8 +242,99 @@ func TestMatcher_IsOk_WithNil(t *testing.T) {
 	}
 }
 
+func TestMatcher_IsTrue_WithTrue(t *testing.T) {
+	assert := With(new(testing.T)).That(true).IsTrue()
+
+	if assert == nil {
+		t.Error("IsTrue returned nil")
+		return
+	}
+
+	if assert.match == false {
+		t.Error("IsTrue matcher failed.")
+	}
+}
+
+func TestMatcher_IsTrue_WithFalse(t *testing.T) {
+	assert := With(new(testing.T)).That(false).IsTrue()
+
+	if assert == nil {
+		t.Error("IsTrue returned nil")
+		return
+	}
+
+	if assert.match == true {
+		t.Error("IsTrue matcher failed.")
+	}
+}
+
+func TestMatcher_IsFalse_WithFalse(t *testing.T) {
+	assert := With(new(testing.T)).That(false).IsFalse()
+
+	if assert == nil {
+		t.Error("IsFalse returned nil")
+		return
+	}
+
+	if assert.match == false {
+		t.Error("IsFalse matcher failed.")
+	}
+}
+
+func TestMatcher_IsFalse_WithTrue(t *testing.T) {
+	assert := With(new(testing.T)).That(true).IsFalse()
+
+	if assert == nil {
+		t.Error("IsFalse returned nil")
+		return
+	}
+
+	if assert.match == true {
+		t.Error("IsFalse matcher failed.")
+	}
+}
+
+func TestMatcher_IsEqualTo_WithInvalidActualType(t *testing.T) {
+	assert := With(new(testing.T)).That(new(testing.T)).IsEqualTo("abc")
+
+	if assert == nil {
+		t.Error("IsEqualTo returned nil")
+		return
+	}
+
+	if assert.match == true {
+		t.Error("IsEqualTo matcher failed")
+	}
+}
+
+func TestMatcher_IsEqualTo_WithInvalidExpectedType(t *testing.T) {
+	assert := With(new(testing.T)).That("abc").IsEqualTo(new(testing.T))
+
+	if assert == nil {
+		t.Error("IsEqualTo returned nil")
+		return
+	}
+
+	if assert.match == true {
+		t.Error("IsEqualTo matcher failed")
+	}
+}
+
+func TestMatcher_IsEqualTo_WithUnequalValues(t *testing.T) {
+	assert := With(new(testing.T)).That("abc").IsEqualTo("def")
+
+	if assert == nil {
+		t.Error("IsEqualTo returned nil")
+		return
+	}
+
+	if assert.match == true {
+		t.Error("IsEqualTo matcher failed")
+	}
+}
+
 func TestMatcher_IsEqualTo_WithNil(t *testing.T) {
-	assert := With(t).That(nil).IsEqualTo(nil)
+	assert := With(new(testing.T)).That(nil).IsEqualTo(nil)
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -256,7 +347,7 @@ func TestMatcher_IsEqualTo_WithNil(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithBool(t *testing.T) {
-	assert := With(t).That(true).IsEqualTo(true)
+	assert := With(new(testing.T)).That(true).IsEqualTo(true)
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -269,7 +360,7 @@ func TestMatcher_IsEqualTo_WithBool(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithComplex(t *testing.T) {
-	assert := With(t).That(complex(1.0, 1.0)).IsEqualTo(complex(1.0, 1.0))
+	assert := With(new(testing.T)).That(complex(1.0, 1.0)).IsEqualTo(complex(1.0, 1.0))
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -282,7 +373,7 @@ func TestMatcher_IsEqualTo_WithComplex(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithFloat(t *testing.T) {
-	assert := With(t).That(3.14159).IsEqualTo(3.14159)
+	assert := With(new(testing.T)).That(3.14159).IsEqualTo(3.14159)
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -295,7 +386,7 @@ func TestMatcher_IsEqualTo_WithFloat(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithInt(t *testing.T) {
-	assert := With(t).That(int64(-128)).IsEqualTo(-128)
+	assert := With(new(testing.T)).That(int64(-128)).IsEqualTo(-128)
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -308,7 +399,7 @@ func TestMatcher_IsEqualTo_WithInt(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithString(t *testing.T) {
-	assert := With(t).That("The quick brown fox jumps over the lazy dog").IsEqualTo("The quick brown fox jumps over the lazy dog")
+	assert := With(new(testing.T)).That("The quick brown fox jumps over the lazy dog").IsEqualTo("The quick brown fox jumps over the lazy dog")
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -321,7 +412,7 @@ func TestMatcher_IsEqualTo_WithString(t *testing.T) {
 }
 
 func TestMatcher_IsEqualTo_WithUint(t *testing.T) {
-	assert := With(t).That(uint(1073741824)).IsEqualTo(uint(1073741824))
+	assert := With(new(testing.T)).That(uint(1073741824)).IsEqualTo(uint(1073741824))
 
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
@@ -337,7 +428,7 @@ func TestMatcher_IsEqualTo_WithArray(t *testing.T) {
 	actual := []byte{'t', 'e', 's', 't'}
 	expect := []byte{'t', 'e', 's', 't'}
 
-	assert := With(t).That(actual).IsEqualTo(expect)
+	assert := With(new(testing.T)).That(actual).IsEqualTo(expect)
 	if assert == nil {
 		t.Error("IsEqualTo returned nil")
 		return
@@ -440,7 +531,7 @@ func TestMatcher_IsGreaterThan_WithUint2(t *testing.T) {
 }
 
 func TestMatcher_ThatPanics_WithPanic(t *testing.T) {
-	assert := With(t)
+	assert := With(new(testing.T))
 	p := func() {
 		panic("Panic! at the Disco")
 	}

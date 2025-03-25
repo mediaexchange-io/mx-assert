@@ -37,7 +37,7 @@ func (m *Matcher) That(actual any) *Matcher {
 	return m
 }
 
-// ThatPanics expects the test to panic.
+// ThatPanics expects the test function to panic.
 func (m *Matcher) ThatPanics(actual func()) {
 	defer func() {
 		if r := recover(); r == nil {
@@ -88,6 +88,24 @@ func (m *Matcher) IsOk() *Matcher {
 	t := reflect.TypeOf(m.actual)
 	if m.match = t == nil || !t.Implements(errorInterface); !m.match {
 		m.t.Errorf("[%s] is not ok", testLine())
+	}
+	return m
+}
+
+// IsTrue verifies the tested value is `true`.
+func (m *Matcher) IsTrue() *Matcher {
+	v := reflect.ValueOf(m.actual)
+	if m.match = v.IsValid() && v.Kind() == reflect.Bool && v.Bool(); !m.match {
+		m.t.Errorf("[%s] is not true", testLine())
+	}
+	return m
+}
+
+// IsFalse verifies the tested value is `false`
+func (m *Matcher) IsFalse() *Matcher {
+	v := reflect.ValueOf(m.actual)
+	if m.match = v.IsValid() && v.Kind() == reflect.Bool && !v.Bool(); !m.match {
+		m.t.Errorf("[%s] is not false", testLine())
 	}
 	return m
 }
@@ -173,11 +191,11 @@ func (m *Matcher) IsGreaterThan(expected any) *Matcher {
 
 func typeCheck(actual any, expected any) (kind, error) {
 	if reflect.TypeOf(actual) == nil {
-		return invalidKind, errors.New("Actual value was nil")
+		return invalidKind, errors.New("actual value was nil")
 	}
 
 	if reflect.TypeOf(expected) == nil {
-		return invalidKind, errors.New("Expected value was nil")
+		return invalidKind, errors.New("expected value was nil")
 	}
 
 	av := reflect.ValueOf(actual)
@@ -223,7 +241,7 @@ func stringValue(rv reflect.Value) string {
 	case reflect.String:
 		return rv.String()
 	default:
-		// All of the types have been accounted for above, so this should
+		// All the types have been accounted for above, so this should
 		// never be reached.
 		panic(errBadType)
 	}
@@ -241,22 +259,22 @@ func testLine() string {
 
 	line := lines[source]
 
-	len := len(line)
+	l := len(line)
 	if index := strings.LastIndex(line, " +"); index >= 0 {
-		len = index
+		l = index
 	}
 
 	if index := strings.LastIndex(line, "/"); index >= 0 {
-		line = line[index+1 : len]
+		line = line[index+1 : l]
 	} else if index := strings.LastIndex(line, "\\"); index >= 0 {
-		line = line[index+1 : len]
+		line = line[index+1 : l]
 	}
 
 	return line
 }
 
 // The following is lifted from https://golang.org/src/text/template/funcs.go
-// None of this is available outside of the package, so we're reproducing it.
+// None of this is available outside the package, so we're reproducing it.
 
 // Errors returned when comparisons go bad.
 var (
